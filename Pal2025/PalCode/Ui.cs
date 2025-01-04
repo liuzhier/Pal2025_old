@@ -118,7 +118,7 @@ namespace Pal
        * 
       --*/
       {
-         S_FREE(lpSpriteUI);
+         S_FREE(ref lpSpriteUI);
       }
 
       public static BYTE
@@ -757,11 +757,11 @@ namespace Pal
       {
          BYTE*    lpBuffer;
 
-         PalUnpak.MKFDecompressChunk(out lpBuffer, 12, g_Global.files.FBP_MKF);
+         PalUnpak.MKFDecompressChunk(out lpBuffer, 1, g_Global.files.FBP_MKF);
          PalUnpak.FBPBlitToSurface(lpBuffer, ref PalVideo.DX_Screen);
          PalVideo.Update();
 
-         S_FREE(lpBuffer);
+         S_FREE(ref lpBuffer);
       }
 
       public static INT

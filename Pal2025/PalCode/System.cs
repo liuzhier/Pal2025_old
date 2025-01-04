@@ -65,7 +65,7 @@ namespace Pal
       --*/
       public static void
       S_FREE(
-         void*    lpAddr
+      ref   void*    lpAddr
       )
       {
          if (lpAddr != null)
@@ -77,74 +77,106 @@ namespace Pal
 
       public static void
       S_FREE(
-         IntPtr lpAddr
+      ref   IntPtr      lpAddr
       )
       {
-         S_FREE((void*)lpAddr);
+         Marshal.FreeHGlobal(lpAddr);
       }
 
       public static void
       S_FREE(
-         CHAR*    lpAddr
+      ref   CHAR*    lpAddr
       )
       {
-         S_FREE((void*)lpAddr);
+         if (lpAddr != null)
+         {
+            Marshal.FreeHGlobal((IntPtr)lpAddr);
+            lpAddr = null;
+         }
       }
 
       public static void
       S_FREE(
-         BYTE*    lpAddr
+      ref   BYTE*    lpAddr
       )
       {
-         S_FREE((void*)lpAddr);
+         if (lpAddr != null)
+         {
+            Marshal.FreeHGlobal((IntPtr)lpAddr);
+            lpAddr = null;
+         }
       }
 
       public static void
       S_FREE(
-         SHORT*      lpAddr
+      ref   SHORT*      lpAddr
       )
       {
-         S_FREE((void*)lpAddr);
+         if (lpAddr != null)
+         {
+            Marshal.FreeHGlobal((IntPtr)lpAddr);
+            lpAddr = null;
+         }
       }
 
       public static void
       S_FREE(
-         WORD*    lpAddr
+      ref   WORD*    lpAddr
       )
       {
-         S_FREE((void*)lpAddr);
+         if (lpAddr != null)
+         {
+            Marshal.FreeHGlobal((IntPtr)lpAddr);
+            lpAddr = null;
+         }
       }
 
       public static void
       S_FREE(
-         INT*    lpAddr
+      ref   INT*     lpAddr
       )
       {
-         S_FREE((void*)lpAddr);
+         if (lpAddr != null)
+         {
+            Marshal.FreeHGlobal((IntPtr)lpAddr);
+            lpAddr = null;
+         }
       }
 
       public static void
       S_FREE(
-         DWORD*      lpAddr
+      ref   DWORD*      lpAddr
       )
       {
-         S_FREE((void*)lpAddr);
+         if (lpAddr != null)
+         {
+            Marshal.FreeHGlobal((IntPtr)lpAddr);
+            lpAddr = null;
+         }
       }
 
       public static void
       S_FREE(
-         LONG*    lpAddr
+      ref   LONG*    lpAddr
       )
       {
-         S_FREE((void*)lpAddr);
+         if (lpAddr != null)
+         {
+            Marshal.FreeHGlobal((IntPtr)lpAddr);
+            lpAddr = null;
+         }
       }
 
       public static void
       S_FREE(
-         QWORD*      lpAddr
+      ref   QWORD*      lpAddr
       )
       {
-         S_FREE((void*)lpAddr);
+         if (lpAddr != null)
+         {
+            Marshal.FreeHGlobal((IntPtr)lpAddr);
+            lpAddr = null;
+         }
       }
 
       public static BOOL

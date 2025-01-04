@@ -42,17 +42,17 @@ namespace Pal
       public static INT
       RLEBlitToSurface(
             BYTE*       lpBitmapRLE,
-      ref   Surface     lpDstSurface,
+      ref   Surface     surfaceDest,
             PAL_POS     pos
       )
       {
-         return RLEBlitToSurfaceWithShadow(lpBitmapRLE, ref lpDstSurface, pos, FALSE);
+         return RLEBlitToSurfaceWithShadow(lpBitmapRLE, ref surfaceDest, pos, FALSE);
       }
 
       public static INT
       RLEBlitToSurfaceWithShadow(
             BYTE*       lpBitmapRLE,
-      ref   Surface     surfacelpDest,
+      ref   Surface     surfaceDest,
             PAL_POS     pos,
             BOOL        bShadow
       )
@@ -68,7 +68,7 @@ namespace Pal
          INT         dy = (SHORT)PAL_Y(pos);
          BYTE*       p;
 
-         fixed (Surface* lpDstSurface = &surfacelpDest)
+         fixed (Surface* lpDstSurface = &surfaceDest)
          {
             //
             // Check for NULL pointer.
@@ -808,7 +808,7 @@ namespace Pal
       public static BYTE*
       MKFSpriteGetFrame(
          BYTE*    lpBuffer,
-         UINT     uiChunkNum
+         INT      iChunkNum
       )
       /*++
         Purpose:
@@ -833,7 +833,7 @@ namespace Pal
          //
          // Check whether the uiChunkNum is out of range..
          //
-         if (uiChunkNum >= MKFGetChunkCount(lpBuffer)) return null;
+         if (iChunkNum >= MKFGetChunkCount(lpBuffer)) return null;
 
          //
          // Get the offset of the specified chunk and the next chunk.
@@ -843,10 +843,10 @@ namespace Pal
          //
          // Return the length of the chunk.
          //
-         return lpBuffer + lpINT[uiChunkNum];
+         return lpBuffer + lpINT[iChunkNum];
       }
 
-      public static WORD
+      public static INT
       SpriteGetNumFrames(
           BYTE*      lpSprite
       )
@@ -869,7 +869,7 @@ namespace Pal
 
          if (lpSprite == null) return 0;
 
-         return (WORD)(lpWORD[0] - 1);
+         return lpWORD[0] - 1;
       }
 
       public static BYTE*
@@ -1025,7 +1025,7 @@ namespace Pal
 
          if (lpFileBuf == null) return PAL_ERROR;
 
-         if (lpFileBuf == null || iChunkNum == 0) return PAL_ERROR;
+         if (lpFileBuf == null) return PAL_ERROR;
 
          lpINT = (INT*)lpFileBuf;
 
@@ -1152,5 +1152,249 @@ namespace Pal
 
          return len;
       }
+
+      public static INT
+      RNGBlitToSurface(
+            BYTE*       rng,
+            INT         length,
+      ref   Surface     surfaceDest
+      )
+      /*++
+        Purpose:
+
+          Blit one frame in an RNG animation to an SDL surface.
+          The surface should contain the last frame of the RNG, or blank if it's the first
+          frame.
+
+          NOTE: Assume the surface is already locked, and the surface is a 320x200 8-bit one.
+
+        Parameters:
+
+          [IN]  rng - Pointer to the RNG data.
+
+          [IN]  length - Length of the RNG data.
+
+          [OUT] lpDstSurface - pointer to the destination SDL surface.
+
+        Return value:
+
+          0 = success, -1 = error.
+
+      --*/
+      {
+         INT      ptr         = 0;
+         INT      dst_ptr     = 0;
+         BYTE     wdata       = 0;
+         INT      x, y, i, n;
+
+         fixed (Surface* lpDstSurface = &surfaceDest)
+         {
+            //
+            // Check for invalid parameters.
+            //
+            if (length < 0)
+            {
+               return -1;
+            }
+
+            //
+            // Draw the frame to the surface.
+            // FIXME: Dirty and ineffective code, needs to be cleaned up
+            //
+            while (ptr < length)
+            {
+               BYTE data = rng[ptr++];
+               switch (data)
+               {
+                  case 0x00:
+                  case 0x13:
+                     //
+                     // End
+                     //
+                     goto end;
+
+                  case 0x02:
+                     dst_ptr += 2;
+                     break;
+
+                  case 0x03:
+                     data = rng[ptr++];
+                     dst_ptr += (data + 1) * 2;
+                     break;
+
+                  case 0x04:
+                     wdata = (BYTE)(rng[ptr] | (rng[ptr + 1] << 8));
+                     ptr += 2;
+                     dst_ptr += (INT)(((UINT)wdata + 1) * 2);
+                     break;
+
+                  case 0x0a:
+                     x = dst_ptr % 320;
+                     y = dst_ptr / 320;
+                     ((BYTE*)(lpDstSurface->pixels))[y * lpDstSurface->pitch + x] = rng[ptr++];
+                     if (++x >= 320)
+                     {
+                        x = 0;
+                        ++y;
+                     }
+                     ((BYTE*)(lpDstSurface->pixels))[y * lpDstSurface->pitch + x] = rng[ptr++];
+                     dst_ptr += 2;
+                     goto case_0x09;
+
+                  case 0x09:
+case_0x09:
+                     x = dst_ptr % 320;
+                     y = dst_ptr / 320;
+                     ((BYTE*)(lpDstSurface->pixels))[y * lpDstSurface->pitch + x] = rng[ptr++];
+                     if (++x >= 320)
+                     {
+                        x = 0;
+                        ++y;
+                     }
+                     ((BYTE*)(lpDstSurface->pixels))[y * lpDstSurface->pitch + x] = rng[ptr++];
+                     dst_ptr += 2;
+                     goto case_0x08;
+
+                  case 0x08:
+case_0x08:
+                     x = dst_ptr % 320;
+                     y = dst_ptr / 320;
+                     ((BYTE*)(lpDstSurface->pixels))[y * lpDstSurface->pitch + x] = rng[ptr++];
+                     if (++x >= 320)
+                     {
+                        x = 0;
+                        ++y;
+                     }
+                     ((BYTE*)(lpDstSurface->pixels))[y * lpDstSurface->pitch + x] = rng[ptr++];
+                     dst_ptr += 2;
+                     goto case_0x07;
+
+                  case 0x07:
+case_0x07:
+                     x = dst_ptr % 320;
+                     y = dst_ptr / 320;
+                     ((BYTE*)(lpDstSurface->pixels))[y * lpDstSurface->pitch + x] = rng[ptr++];
+                     if (++x >= 320)
+                     {
+                        x = 0;
+                        ++y;
+                     }
+                     ((BYTE*)(lpDstSurface->pixels))[y * lpDstSurface->pitch + x] = rng[ptr++];
+                     dst_ptr += 2;
+                     goto case_0x06;
+
+                  case 0x06:
+case_0x06:
+                     x = dst_ptr % 320;
+                     y = dst_ptr / 320;
+                     ((BYTE*)(lpDstSurface->pixels))[y * lpDstSurface->pitch + x] = rng[ptr++];
+                     if (++x >= 320)
+                     {
+                        x = 0;
+                        ++y;
+                     }
+                     ((BYTE*)(lpDstSurface->pixels))[y * lpDstSurface->pitch + x] = rng[ptr++];
+                     dst_ptr += 2;
+                     break;
+
+                  case 0x0b:
+                     data = *(rng + ptr++);
+                     for (i = 0; i <= data; i++)
+                     {
+                        x = dst_ptr % 320;
+                        y = dst_ptr / 320;
+                        ((BYTE*)(lpDstSurface->pixels))[y * lpDstSurface->pitch + x] = rng[ptr++];
+                        if (++x >= 320)
+                        {
+                           x = 0;
+                           ++y;
+                        }
+                        ((BYTE*)(lpDstSurface->pixels))[y * lpDstSurface->pitch + x] = rng[ptr++];
+                        dst_ptr += 2;
+                     }
+                     break;
+
+                  case 0x0c:
+                     wdata = (BYTE)(rng[ptr] | (rng[ptr + 1] << 8));
+                     ptr += 2;
+                     for (i = 0; i <= wdata; i++)
+                     {
+                        x = dst_ptr % 320;
+                        y = dst_ptr / 320;
+                        ((BYTE*)(lpDstSurface->pixels))[y * lpDstSurface->pitch + x] = rng[ptr++];
+                        if (++x >= 320)
+                        {
+                           x = 0;
+                           ++y;
+                        }
+                        ((BYTE*)(lpDstSurface->pixels))[y * lpDstSurface->pitch + x] = rng[ptr++];
+                        dst_ptr += 2;
+                     }
+                     break;
+
+                  case 0x0d:
+                  case 0x0e:
+                  case 0x0f:
+                  case 0x10:
+                     for (i = 0; i < data - (0x0d - 2); i++)
+                     {
+                        x = dst_ptr % 320;
+                        y = dst_ptr / 320;
+                        ((BYTE*)(lpDstSurface->pixels))[y * lpDstSurface->pitch + x] = rng[ptr];
+                        if (++x >= 320)
+                        {
+                           x = 0;
+                           ++y;
+                        }
+                        ((BYTE*)(lpDstSurface->pixels))[y * lpDstSurface->pitch + x] = rng[ptr + 1];
+                        dst_ptr += 2;
+                     }
+                     ptr += 2;
+                     break;
+
+                  case 0x11:
+                     data = *(rng + ptr++);
+                     for (i = 0; i <= data; i++)
+                     {
+                        x = dst_ptr % 320;
+                        y = dst_ptr / 320;
+                        ((BYTE*)(lpDstSurface->pixels))[y * lpDstSurface->pitch + x] = rng[ptr];
+                        if (++x >= 320)
+                        {
+                           x = 0;
+                           ++y;
+                        }
+                        ((BYTE*)(lpDstSurface->pixels))[y * lpDstSurface->pitch + x] = rng[ptr + 1];
+                        dst_ptr += 2;
+                     }
+                     ptr += 2;
+                     break;
+
+                  case 0x12:
+                     n = (rng[ptr] | (rng[ptr + 1] << 8)) + 1;
+                     ptr += 2;
+                     for (i = 0; i < n; i++)
+                     {
+                        x = dst_ptr % 320;
+                        y = dst_ptr / 320;
+                        ((BYTE*)(lpDstSurface->pixels))[y * lpDstSurface->pitch + x] = rng[ptr];
+                        if (++x >= 320)
+                        {
+                           x = 0;
+                           ++y;
+                        }
+                        ((BYTE*)(lpDstSurface->pixels))[y * lpDstSurface->pitch + x] = rng[ptr + 1];
+                        dst_ptr += 2;
+                     }
+                     ptr += 2;
+                     break;
+               }
+            }
+         }
+
+      end:
+         return 0;
+      }
+      
    }
 }

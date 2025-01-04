@@ -36,7 +36,7 @@ namespace Pal
       public const   LPSTR g_lpsz3rdVLC      = $"VLC";
       public static  readonly LPSTR[]  GAME_FILE_NAME_LIST  =
       {
-         "ABC.MKF",  "BALL.MKF", "DATA.MKF",    "F.MKF",    "FBP.MKF",
+         "ABC.MKF",  "BALL.MKF", "UI.MKF",    "F.MKF",    "FBP.MKF",
          "FIRE.MKF", "GOP.MKF",  "MAP.MKF",     "MGO.MKF",  "PAT.MKF",
          "RGM.MKF",  "RNG.MKF",  "SOUNDS.MKF",  "SSS.MKF",
       };

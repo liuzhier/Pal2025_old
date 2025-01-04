@@ -170,8 +170,9 @@ namespace Pal
          // 所有资源已初始化完毕，
          // 播放音乐 88 和开场动画
          //
+         /*
          PalWave.Play(88);
-         PalMovie.Play(1, "MP4");
+         PalMovie.Play(1, "bik");
          while (TRUE)
          {
             PalInput.ClearKeyState();
@@ -188,6 +189,7 @@ namespace Pal
             }
          }
          PalVideo.FadeOut(PalPalette.GetColor(0), FALSE, 1);
+         */
 
          //
          // 进入游戏主循环

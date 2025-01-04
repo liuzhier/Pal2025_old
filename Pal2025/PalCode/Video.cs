@@ -208,8 +208,8 @@ namespace Pal
        * 
       --*/
       {
-         S_FREE(src.pixels);
-         S_FREE(src.bgra);
+         S_FREE(ref src.pixels);
+         S_FREE(ref src.bgra);
 
          if (src.bmp != null)
          {

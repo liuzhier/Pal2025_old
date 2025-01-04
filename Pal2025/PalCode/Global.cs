@@ -31,7 +31,7 @@ namespace Pal
       {
          public BYTE*      ABC_MKF;
          public BYTE*      BALL_MKF;
-         public BYTE*      UI_MKF;
+         public BYTE*      DATA_MKF;
          public BYTE*      F_MKF;
          public BYTE*      FBP_MKF;
          public BYTE*      FIRE_MKF;
